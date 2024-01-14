@@ -71,7 +71,7 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
-        # bird movement
+        # bird movement 
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_SPACE:
                 last_time_jump = current_time
