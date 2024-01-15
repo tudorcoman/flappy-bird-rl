@@ -10,11 +10,11 @@ class FlappyBirdGame:
         if not headless:
             self.screen = pygame.display.set_mode((700, 487))
             pygame.display.set_caption("Flappy RL")
-            self.background_image = pygame.image.load('background.jpg')
+            self.background_image = pygame.image.load('background.jpg').convert_alpha()
             #customize the bird
-            self.bird_image = pygame.image.load('bird_rl.png')
-            self.pipe_down = pygame.image.load('pipe_small_down.png')
-            self.pipe_up = pygame.image.load('pipe_small_up.png')
+            self.bird_image = pygame.image.load('bird_rl.png').convert_alpha()
+            self.pipe_down = pygame.image.load('pipe_small_down.png').convert_alpha()
+            self.pipe_up = pygame.image.load('pipe_small_up.png').convert_alpha()
             self.font = pygame.font.Font('freesansbold.ttf', 32) 
         self.x_location = 700
         self.x_location_change = 0
@@ -58,7 +58,7 @@ class FlappyBirdGame:
         self.jump_interval = 300
         self.last_animation_time = 0 
         self.animation_time = 0
-        self.aniimation_interval = 500 
+        self.aniimation_interval = 100 
         self.start_jump_y = 0
         self.max_jump_height = 50
         self.actions = []
@@ -94,7 +94,7 @@ class FlappyBirdGame:
 
     def start_jump_action(self):
         self.last_animation_time = pygame.time.get_ticks()
-        self.x_location_change = -0.2
+        self.x_location_change = -1
         if not self.jumping:
             self.jumping = True
             self.start_jump_y = self.bird_y
@@ -110,7 +110,7 @@ class FlappyBirdGame:
             else:
                 self.bird_y += self.bird_y_change
         else:
-            self.bird_y_change = 0.2  # Falling down when not jumping
+            self.bird_y_change = 0.5  # Falling down when not jumping
 
     def evaluate_bird_position(self):
         if self.bird_y <= 0: 
@@ -126,7 +126,7 @@ class FlappyBirdGame:
         if self.animation_time - self.last_animation_time > self.aniimation_interval:
             if self.bird_y_change < 0:
                 self.last_animation_time = self.animation_time
-                self.bird_y_change = 0.2                 
+                self.bird_y_change = 0.5             
 
     def advance_game(self):
         self.x_location += self.x_location_change
@@ -168,8 +168,9 @@ class FlappyBirdGame:
         pygame.quit()
 
     def run_game_once(self):
-        self.screen.fill((0, 0, 0))
-        self.screen.blit(self.background_image, (0,0))
+        if not self.headless:
+            self.screen.fill((0, 0, 0))
+            self.screen.blit(self.background_image, (0,0))
 
         if self.use_keyboard:
             actions = self.handle_keyboard_events()
@@ -179,7 +180,8 @@ class FlappyBirdGame:
             self.step(self.actions)
             self.actions = []
         if self.running:
-            pygame.display.update() 
+            if not self.headless:
+                pygame.display.update() 
         else:
             pygame.quit() 
 
@@ -203,10 +205,10 @@ class FlappyBirdGame:
     def run_game_thread(self, thread):
         thread.start()
         self.run_game()
-        thread.join()
+        #thread.join()
 
     def get_state(self):
-        return (self.bird_y, self.bird_y_change, self.x_location - self.bird_x, self.height)
+        return (self.bird_y - 200, int(self.x_location - self.bird_x), int(self.height + 707 - self.bird_y))
     
     def apply_action(self, action):
         if action == 1: 
