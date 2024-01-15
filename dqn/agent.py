@@ -134,10 +134,10 @@ def train_agent(agent, env_no_render, env_render, episodes, early_stop=200):
     scores_window = deque(maxlen=100)
 
     for episode in range(1, episodes+1):
-        # if episode < 5000 or episode % 200:
-        #     env = env_no_render
-        # else:
-        #     env = env_render
+        if episode < 3000 or episode % 200:
+            env = env_no_render
+        else:
+            env = env_render
         env = env_no_render
         state, _ = env.reset()
         total_reward = 0 
