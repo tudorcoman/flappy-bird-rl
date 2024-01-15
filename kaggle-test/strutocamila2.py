@@ -65,7 +65,14 @@ def add_to_replay_buffer(state, action, reward, next_state, done):
 
 def train_policy_network():
     minibatch = random.sample(replay_buffer, batch_size)
-    
+    for state, action, reward, next_state, done in minibatch:
+        target = reward
+        if not done:
+            target = (reward + gamma * np.amax(model.predict(next_state, verbose=0)[0]))
+        target_f = model.predict(state, verbose=0)
+        target_f[0][action] = target
+        model.fit(state, target_f, epochs=1, verbose=0)
+
 best_score = 0
 game = 0
 while game < 100:
