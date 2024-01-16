@@ -4,7 +4,7 @@
 
 Tema proiectului implementarea a doi algoritmi de Reinforcement Learning asupra mediului descris mai jos:
 - Q-Learning cu deep Q network (DQN)
-- PPO (Proximal Policy Optimization)
+- SARSA cu neural network (Deep SARSA)
 
 ## Descrierea mediului
 
@@ -30,7 +30,17 @@ DQN este un algoritm off-policy, adică agentul învață o politică diferită 
 
 TODO: de adaugat rezultate antrenare 
 
-### 2. PPO
+### 2. (Deep) SARSA
+
+SARSA este un algoritm de tip on-policy, acesta luându-și deciziile pe baza aceleiași politici pe care o folosește pentru a învața. Abordarea SARSA este de tip Temporal Difference (TD), care învață prin actualizarea funcției Q pe baza "diferenței temporale" dintre recompensa prezisă și cea observată și așa el poate să maximizeze mult mai bine recompensa. Această actualizare se face după fiecare pas dintr-o pereche stare-acțiune la următoarea, nu doar la final de episod. Asemănător cu DQN, SARSA folosește tot o strategie ε-Greedy pentru a alege acțiunile în mod aleatoriu, cu probabilitatea ε, iar în rest urmărește valoarea cea mai bună de pe politica actuală.
+
+Principala caracteristică a SARSA este că este un algoritm de învățare mai sigur, în comparație cu DQN. Asta este un avantaj mare în mediile unde anumite acțiuni pot duce la consecințe negative. Din punct de vedere al timpului, SARSA este aproape optim, deși poate converge mai încet decât DQN în anumite medii pentru că prioritizează siguranța. Performanța depinde de echilibrul pe care îl găsește între explorare și exploatare, precum și de modul în care politica este actualizată în timp.
+
+Într-adevăr, și în cazul nostru, acesta converge mai greu, obținând primele rezultate după 5000 de episoade. Similar cu DQN, și SARSA poate folosi rețele neurale pentru aproximarea funcției Q în cazul mediilor prea complexe. În acest caz se numește Deep SARSA și nu este așa frecvent ca DQN. 
+
+TODO: de adaugat rezultate antrenare 
+
+### 3. PPO (attempt)
 
 PPO este de asemenea un algoritm off-policy. Acesta face parte din categoria metodelor de policy gradient, pentru că el își parametrizează direct politica. Spre deosebire de DQN și SARSA (algoritmi bazați pe valori), obiectivul principal al acestui algoritm este să învețe o politică în care sunt mapate stările cu acțiuni, în așa fel încât să se maximizeze recompensa cumulativ. 
 
@@ -38,7 +48,7 @@ Pentru a îmbunătăți politica și în același timp să nu fie alterată semn
 
 Acest algoritm este foarte performant chiar și în medii mai complexe, pentru că este capabil să facă decizii mari și în același timp și sigure, prevenind schimbări majore în politică ce are duce la o antrenare instabilă. 
 
-TODO: de adaugat rezultate antrenare 
+Am încercat implementarea acestui algoritm, dar nu am reușit să facem agentul să învețe mediul. Probabil este nevoie să îmbunătățim arhitectura rețelelor și să hipertunăm parametrii mai mult.
 
 ## Bibliografie 
 
@@ -47,3 +57,5 @@ TODO: de adaugat rezultate antrenare
 2. [Deep Reinforcement Learning for Flappy Bird](https://cs229.stanford.edu/proj2015/362_report.pdf)
 
 3. [arXiv:2003.09579v2](https://arxiv.org/abs/2003.09579v2)
+
+4. [arXiv:1702.03118](https://arxiv.org/pdf/1702.03118.pdf)
