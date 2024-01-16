@@ -2,6 +2,7 @@ import random, logging, torch
 import numpy as np 
 from typing import Tuple, Any 
 from collections import deque 
+import csv
 
 import torch.nn as nn 
 import torch.nn.functional as fct 
@@ -13,6 +14,10 @@ device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 torch.manual_seed(0)
 random.seed(0)
 np.random.seed(0)
+
+csv_file = open('dqn/statistics.csv', 'w', newline='')
+csv_writer = csv.writer(csv_file)
+csv_writer.writerow(['Episode', 'Average Reward', 'Average Score'])
 
 # Create the Q-Network 
 def create_q_network(state_size, action_size):
@@ -84,7 +89,7 @@ class DQNAgent:
         self.time_step = 0 
 
     def step(self, state, action, reward, next_state, done, episode): 
-        add_to_replay_memory(state, action, reward, next_state, done)
+        add_to_replay_memory(self.memory, state, action, reward, next_state, done)
 
         self.time_step = (self.time_step + 1) % 4
         if self.time_step == 0: 
@@ -161,6 +166,7 @@ def train_agent(agent, env_no_render, env_render, episodes, early_stop=200):
         print(f"\rEpisode {episode}\tAverage Reward: {np.mean(rewards_window):.2f}\tAverage Score: {np.mean(scores_window):.2f}", end="")
         if episode % 100 == 0:
             print(f"\rEpisode {episode}\tAverage Reward: {np.mean(rewards_window):.2f}\tAverage Score: {np.mean(scores_window):.2f}")
+            csv_writer.writerow([episode, np.mean(rewards_window), np.mean(scores_window)])
         if np.mean(scores_window) >= early_stop:
             print(f"\nEnvironment solved in {episode-100:d} episodes!\tAverage Score: {np.mean(scores_window):.2f}")
             break 
