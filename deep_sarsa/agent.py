@@ -35,34 +35,25 @@ def create_q_network(state_size, action_size):
 def create_replay_memory(memory_size):
     return deque(maxlen=memory_size)
 
-def add_to_replay_memory(memory, state, action, reward, next_state, done):
-    memory.append((state, action, reward, next_state, done))
+def add_to_replay_memory(memory, state, action, reward, next_state, next_action, done):
+    memory.append((state, action, reward, next_state, next_action, done))
 
 def sample_from_replay_memory(memory, batch_size):
     sample = random.sample(memory, batch_size)
 
-    states = []
-    actions = []
-    rewards = []
-    next_states = [] 
-    dones = [] 
-
-    for s in sample:
-        states.append(s[0])
-        actions.append(s[1])
-        rewards.append(s[2])
-        next_states.append(s[3])
-        dones.append(s[4])
+    states, actions, rewards, next_states, next_actions, dones = zip(*sample)
 
     torch_states = torch.from_numpy(np.vstack(states)).float().to(device)
     torch_actions = torch.from_numpy(np.vstack(actions)).long().to(device)
     torch_rewards = torch.from_numpy(np.vstack(rewards)).float().to(device)
     torch_next_states = torch.from_numpy(np.vstack(next_states)).float().to(device)
+    torch_next_actions = torch.from_numpy(np.vstack(next_actions)).long().to(device)
     torch_dones = torch.from_numpy(np.vstack(dones).astype(np.uint8)).float().to(device)
 
-    return (torch_states, torch_actions, torch_rewards, torch_next_states, torch_dones)
+    return (torch_states, torch_actions, torch_rewards, torch_next_states, torch_next_actions, torch_dones)
 
-class DQNAgent: 
+
+class DeepSARSAAgent: 
     def __init__(self, state_size, action_size):
         self.state_size = state_size 
         self.action_size = action_size 
@@ -83,8 +74,8 @@ class DQNAgent:
 
         self.time_step = 0 
 
-    def step(self, state, action, reward, next_state, done, episode): 
-        add_to_replay_memory(state, action, reward, next_state, done)
+    def step(self, state, action, reward, next_state, next_action, done, episode): 
+        add_to_replay_memory(self.memory, state, action, reward, next_state, next_action, done)
 
         self.time_step = (self.time_step + 1) % 4
         if self.time_step == 0: 
@@ -125,6 +116,25 @@ class DQNAgent:
         # θ_target = τ*θ_local + (1 - τ)*θ_target
         for target_param, local_param in zip(self.target_qnet.parameters(), self.local_qnet.parameters()):
             target_param.data.copy_(self.tau * local_param.data + (1.0 - self.tau) * target_param.data)
+    
+    def learn(self, experiences):
+        states, actions, rewards, next_states, next_actions, dones = experiences
+
+        # SARSA: Use the Q-values based on the next actions that were actually taken
+        Q_targets_next = self.target_qnet(next_states).gather(1, next_actions)
+        Q_targets = rewards + (self.gamma * Q_targets_next * (1 - dones))
+
+        Q_expected = self.local_qnet(states).gather(1, actions)
+
+        loss = fct.mse_loss(Q_expected, Q_targets)
+        self.losses.append(loss)
+        self.optimizer.zero_grad()
+        loss.backward()
+        self.optimizer.step()
+
+        # Soft update of target network
+        for target_param, local_param in zip(self.target_qnet.parameters(), self.local_qnet.parameters()):
+            target_param.data.copy_(self.tau * local_param.data + (1.0 - self.tau) * target_param.data)
 
 
 def train_agent(agent, env_no_render, env_render, episodes, early_stop=200):
@@ -147,8 +157,10 @@ def train_agent(agent, env_no_render, env_render, episodes, early_stop=200):
         while not done:
             action = agent.choose_action(state)
             next_state, reward, done, _, score_object = env.step(action)
-            agent.step(state, action, reward, next_state, done, episode)
+            next_action = agent.choose_action(next_state) # Choose the next action
+            agent.step(state, action, reward, next_state, next_action, done, episode)
             state = next_state.copy()
+            action = next_action
             total_reward += reward
             if done:
                 break 
