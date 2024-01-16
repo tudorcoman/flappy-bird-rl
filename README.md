@@ -28,7 +28,13 @@ DQN este un algoritm off-policy, adică agentul învață o politică diferită 
 
 2. Rețeaua secundară (țintă): o copie a primei rețele care nu este actualizată la fiecare pas și are rolul de a stabiliza actualizările valorilor Q. Astfel, este evitată și problema "moving target". 
 
-TODO: de adaugat rezultate antrenare 
+![DQN Algorithm Evolution](dqn/evolution_graph.png)
+
+Dacă utiliazm algoritmul DQN, recompensa medie crește de la episod la episod. 
+
+Micile fluctuații sunt din cauza faptului că algoritmul testează mai multe strategii înainte de a le alege pe cele optime.
+
+Am putea obține un scor mai bun jucându-ne cu hiperparametri sau adaptând rețeaua neuronală, în detrimentul unui timp de antrenament mai lung.
 
 ### 2. (Deep) SARSA
 
