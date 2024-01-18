@@ -28,7 +28,7 @@ DQN este un algoritm off-policy, adică agentul învață o politică diferită 
 
 2. Rețeaua secundară (țintă): o copie a primei rețele care nu este actualizată la fiecare pas și are rolul de a stabiliza actualizările valorilor Q. Astfel, este evitată și problema "moving target". 
 
-TODO: de adaugat rezultate antrenare 
+
 
 ### 2. (Deep) SARSA
 
@@ -38,7 +38,14 @@ Principala caracteristică a SARSA este că este un algoritm de învățare mai 
 
 Într-adevăr, și în cazul nostru, acesta converge mai greu, obținând primele rezultate după 5000 de episoade. Similar cu DQN, și SARSA poate folosi rețele neurale pentru aproximarea funcției Q în cazul mediilor prea complexe. În acest caz se numește Deep SARSA și nu este așa frecvent ca DQN. 
 
-TODO: de adaugat rezultate antrenare 
+![Deep Sarsa Algorithm Evolution](deep_sarsa\evolution_graph.png)
+
+## Discuție
+
+1. Se observă ca după aproape jumătate de antrenament, agentul învață și își îmbunătățește performanța, deoarece se adaptează la mediul de joc.
+2. Fluctuațiile care sunt vizibile pe grafic demonstrează încercările agentului de a explora diferite strategii, ținta fiind maximizarea recompensei.
+3. Tendința de creștere a recompensei medii sugerează optimizarea comportamentului agentului, un indicator pozitiv cu privire la evoluția acestuia.
+4. La fel ca la DQN, s-ar putea obține rezultate mai bune dacă am regla parametrii, sau adaptând rețeaua neurală, fapt ce va mări durata antrenamentului și timpul de așteptare.
 
 ### 3. PPO (attempt)
 
