@@ -8,11 +8,18 @@ import torch.nn.functional as fct
 import torch.optim as optim
 import time 
 
+import csv
+
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 torch.manual_seed(0)
 random.seed(0)
 np.random.seed(0)
+
+# Create CSV file for saving statistics
+csv_file = open('statistics25000.csv', 'w', newline='')
+csv_writer = csv.writer(csv_file)
+csv_writer.writerow(['Episode', 'Average Reward', 'Average Score'])
 
 # Create the Q-Network 
 def create_q_network(state_size, action_size):
@@ -137,7 +144,7 @@ class DeepSARSAAgent:
             target_param.data.copy_(self.tau * local_param.data + (1.0 - self.tau) * target_param.data)
 
 
-def train_agent(agent, env_no_render, env_render, episodes, early_stop=200):
+def train_agent(agent, env_no_render, env_render, episodes, early_stop=100):
     rewards = []
     scores = []
     rewards_window = deque(maxlen=100)
@@ -173,6 +180,7 @@ def train_agent(agent, env_no_render, env_render, episodes, early_stop=200):
         print(f"\rEpisode {episode}\tAverage Reward: {np.mean(rewards_window):.2f}\tAverage Score: {np.mean(scores_window):.2f}", end="")
         if episode % 100 == 0:
             print(f"\rEpisode {episode}\tAverage Reward: {np.mean(rewards_window):.2f}\tAverage Score: {np.mean(scores_window):.2f}")
+            csv_writer.writerow([episode, np.mean(rewards_window), np.mean(scores_window)])
         if np.mean(scores_window) >= early_stop:
             print(f"\nEnvironment solved in {episode-100:d} episodes!\tAverage Score: {np.mean(scores_window):.2f}")
             break 
