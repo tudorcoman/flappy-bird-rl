@@ -17,5 +17,5 @@ print(f"State size: {state_size}")
 env.reset()
 agent = DQNAgent(state_size, action_size)
 
-train_agent(agent, env_2, env_1, 10000)
+train_agent(agent, env_2, env_1, 25000)
 
