@@ -44,7 +44,7 @@ Principala caracteristică a SARSA este că este un algoritm de învățare mai 
 
 Într-adevăr, și în cazul nostru, acesta converge mai greu, obținând primele rezultate după 5000 de episoade. Similar cu DQN, și SARSA poate folosi rețele neurale pentru aproximarea funcției Q în cazul mediilor prea complexe. În acest caz se numește Deep SARSA și nu este așa frecvent ca DQN. 
 
-![Deep Sarsa Algorithm Evolution](deep_sarsa\evolution_graph.png)
+![Deep Sarsa Algorithm Evolution](deep_sarsa/evolution_graph.png)
 
 ## Discuție
 
